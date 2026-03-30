@@ -114,8 +114,20 @@ class BaiduPCSApi:
     ) -> List[PcsFile]:
         """List directory contents"""
 
-        info = self._baidupcs.list(remotepath, desc=desc, name=name, time=time, size=size)
-        pcs_files = [PcsFile.from_(v) for v in info.get("list", [])]
+        _page_size = 1000
+        pcs_files: List[PcsFile] = []
+        start = 0
+        while True:
+            info = self._baidupcs.list(
+                remotepath, desc=desc, name=name, time=time, size=size,
+                start=start, limit=_page_size,
+            )
+            page = [PcsFile.from_(v) for v in info.get("list", [])]
+            pcs_files.extend(page)
+            if len(page) < _page_size:
+                break
+            start += _page_size
+
         if recursive:
             for pcs_file in pcs_files:
                 if pcs_file.is_dir:

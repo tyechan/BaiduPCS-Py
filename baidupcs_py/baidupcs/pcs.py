@@ -263,6 +263,8 @@ class BaiduPCS:
         name: bool = False,
         time: bool = False,
         size: bool = False,
+        start: int = 0,
+        limit: int = 1000,
     ):
         url = PcsNode.File.url()
         orderby = None
@@ -278,7 +280,7 @@ class BaiduPCS:
         params = {
             "method": "list",
             "by": orderby,
-            "limit": "0-2147483647",
+            "limit": f"{start}-{start + limit}",
             "order": ["asc", "desc"][desc],
             "path": str(remotepath),
         }
